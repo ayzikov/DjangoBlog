@@ -1,12 +1,15 @@
 # импорты проекта
 from .models import Post
-from .forms import EmailPostForm
+from .forms import EmailPostForm, CommentPostForm
 
 # импорты джанго
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
+from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
+
 
 # def list_posts(request: HttpRequest):
 #     posts = Post.published.published()
@@ -29,7 +32,7 @@ class PostListView(ListView):
 
 
 def detail_post(request: HttpRequest, year, month, day, slug):
-    # функция извлекает либо объект из БД либо вызывает исключение 404
+    ''' Функция извлекает либо объект из БД либо вызывает исключение 404 '''
     post = get_object_or_404(Post,
                              status=Post.Status.PUBLISHED,
                              publish__year=year,
@@ -37,16 +40,19 @@ def detail_post(request: HttpRequest, year, month, day, slug):
                              publish__day=day,
                              slug=slug)
 
-
+    comments = post.comments.all()
+    form = CommentPostForm()
     return render(request,
                   'blog/post/detail.html',
-                  {'post': post})
+                  {'post': post, 'comments': comments, 'form': form})
 
 def post_share(request: HttpRequest, post_id):
     ''' Функция для вывода формы и отправки email '''
     post = get_object_or_404(Post,
                              id=post_id,
                              status=Post.Status.PUBLISHED)
+
+    sent = False
 
     # проверяем тип запроса и выводим форму либо отправляем сообщение на почту
     if request.method == 'POST':
@@ -56,11 +62,69 @@ def post_share(request: HttpRequest, post_id):
         if form.is_valid():
             # словарь полей формы и их значений
             cd = form.cleaned_data
-            return HttpResponse('<h1>Форма валидна</h1>')
+
+            # абсолютный url поста
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+
+            # тема сообщения
+            email_title = f"Новый пост"
+
+            # тело сообщения
+            email_body = (f"Пользователь {cd['name']} поделился с Вами постом\n'{post.title}'\n\n"
+                          f"Прочитать можно по этой ссылке - {post_url}\n\n"
+                          f"Комментарий пользователя:\n"
+                          f"{cd['comment']}")
+
+            send_mail(
+                subject=email_title,
+                message=email_body,
+                from_email='ayzikov070@yandex.ru',
+                recipient_list=[cd['to_email']]
+            )
+
+            sent = True
+
+
 
     else:
         form = EmailPostForm()
-        return render(request,
-                      'blog/post/share.html',
-                      {'post': post, 'form': form})
+
+    return render(request,
+                  'blog/post/share.html',
+                  {'post': post, 'form': form, 'sent': sent})
+
+
+@require_POST
+def post_comment(request: HttpRequest, post_id):
+    post = get_object_or_404(Post,
+                             id=post_id,
+                             status=Post.Status.PUBLISHED)
+
+    comment = None
+
+    # получаем экземпляр формы с данными которые ввел пользователь
+    form = CommentPostForm(request.POST)
+
+    if form.is_valid():
+        # создаем объект комментария не сохраняя его в БД
+        comment = form.save(commit=False)
+
+        # добавляем пост к комментарию
+        comment.post = post
+
+        # сохраняем в БД
+        comment.save()
+
+
+    return render(request,
+                  'blog/post/comment.html',
+                  {'post': post, 'form': form, 'comment': comment}
+                  )
+
+
+
+
+
+
+
 

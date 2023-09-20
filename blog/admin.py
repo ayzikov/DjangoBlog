@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post
+from .models import Post, Comment
 
 @admin.register(Post)
 class AdminPost(admin.ModelAdmin):
@@ -17,3 +17,10 @@ class AdminPost(admin.ModelAdmin):
     date_hierarchy = 'publish'
     # все посты будут автоматически сортироваться по статусу и по дате публикации
     ordering = ['status', 'publish']
+
+
+@admin.register(Comment)
+class AdminComment(admin.ModelAdmin):
+    list_display = ['id', 'name', 'post', 'created', 'active']
+    list_filter = ['active', 'created', 'updated']
+    search_fields = ['name', 'email', 'body']
