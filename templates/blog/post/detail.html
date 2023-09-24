@@ -36,4 +36,14 @@
     {% empty %}
         <p>Комментариев пока нет</p>
     {% endfor %}
+
+    <!-- кнопки для сортировки комментариев -->
+    <form method="get">
+      {% csrf_token %}
+        <button name="desc">По убыванию</button>
+        <button name="asc">По возрастанию</button>
+    </form>
+
+    <!-- форма для добавления комментариев -->
+    {% include "blog/post/include/comment_form.html" %}
 {% endblock %}

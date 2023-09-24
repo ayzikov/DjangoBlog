@@ -40,7 +40,14 @@ def detail_post(request: HttpRequest, year, month, day, slug):
                              publish__day=day,
                              slug=slug)
 
-    comments = post.comments.all()
+    # сортировка комментариев
+    comment_order = 'created'
+    if 'desc' in request.GET:
+        comment_order = '-created'
+    elif 'asc' in request.GET:
+        comment_order = 'created'
+    comments = post.comments.filter(active=True).order_by(comment_order)
+
     form = CommentPostForm()
     return render(request,
                   'blog/post/detail.html',
