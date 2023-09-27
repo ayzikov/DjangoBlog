@@ -1,4 +1,6 @@
+{% load blog_tags %}
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,12 +11,17 @@
 <body>
     <div id="content">
         {% block content %}
-
         {% endblock %}
     </div>
     <div id="sidebar">
         <h2>My blog</h2>
-        <p>This is my blog.</p>
+        <p>Всего написанно постов: {% total_posts %}</p>
+        
+        <h2>Последние посты</h2>
+        {% show_latest_posts 2 %}
+        
+        <h2>Самые заккоментированные посты</h2>
+        {% get_most_commented_posts 2 %}
     </div>
 </body>
 </html>

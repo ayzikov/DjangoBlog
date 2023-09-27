@@ -1,6 +1,7 @@
 # импорты проекта
 from .models import Post
 from .forms import EmailPostForm, CommentPostForm
+from taggit.models import Tag
 
 # импорты джанго
 from django.shortcuts import render, get_object_or_404
@@ -9,26 +10,36 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
+from django.db.models import Count
 
 
-# def list_posts(request: HttpRequest):
-#     posts = Post.published.published()
-#     paginator = Paginator(posts, 3)
-#
-#     # получаем из параметров url номер страницы, если этого параметра нет, то получаем 1
-#     page_number = request.GET.get('page', 1)
-#     # получаем объект Page, который содержит посты на странице page_number
-#     page_obj = paginator.get_page(page_number)
-#
-#     return render(request,
-#                   'blog/post/list_posts.html',
-#                   {'page_obj': page_obj})
+def list_posts(request: HttpRequest, tag_slug=None):
+    posts = Post.published.published()
 
-class PostListView(ListView):
-    context_object_name = 'posts'
-    paginate_by = 3
-    template_name = 'blog/post/list_posts.html'
-    queryset = Post.published.all()
+    tag = None
+    if tag_slug:
+        # если передали slug тега, то получаем его экзепляр и в posts
+        # получаем QuerySet постов у которых в тегах есть такой тег
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        posts = posts.filter(tag__in=[tag])
+
+
+    # реализация постраничной разбивки
+    paginator = Paginator(posts, 3)
+    # получаем из параметров url номер страницы, если этого параметра нет, то получаем 1
+    page_number = request.GET.get('page', 1)
+    # получаем объект Page, который содержит посты на странице page_number
+    page_obj = paginator.get_page(page_number)
+
+    return render(request,
+                  'blog/post/list_posts.html',
+                  {'page_obj': page_obj, 'tag': tag})
+
+# class PostListView(ListView):
+#     context_object_name = 'posts'
+#     paginate_by = 3
+#     template_name = 'blog/post/list_posts.html'
+#     queryset = Post.published.all()
 
 
 def detail_post(request: HttpRequest, year, month, day, slug):
@@ -48,10 +59,27 @@ def detail_post(request: HttpRequest, year, month, day, slug):
         comment_order = 'created'
     comments = post.comments.filter(active=True).order_by(comment_order)
 
+    # форма для комментариев
     form = CommentPostForm()
+
+    # выборка постов с одинаковыми тегами
+
+    # список id тегов которые есть у данного поста (post), flat=True чтобы получить [1, 2, 3, ...],
+    # а не [(1,), (2,), (3,), ...]
+    post_tags = post.tag.values_list('id', flat=True)
+
+    # получаем QS (QuerySet) постов с тегами которые содержат id такие же как и у данного поста (post)
+    # например: если у поста 3 одинаковых тега с данным постом (post), то он добавляется в QS 3 раза
+    # исключаем из этого QS данный пост (post)
+    similar_posts = Post.published.filter(tag__in=post_tags).exclude(id=post.id)
+
+    # с помощью annotate добавляем к каждому объекту QS новое поле same_tags,
+    # которое содержит количество одинаковых тегов с данным постом (post) и сортируем
+    similar_posts = similar_posts.annotate(same_tags=Count('tag')).order_by('-same_tags', '-publish')[:4]
+
     return render(request,
                   'blog/post/detail.html',
-                  {'post': post, 'comments': comments, 'form': form})
+                  {'post': post, 'comments': comments, 'form': form, 'similar_posts': similar_posts})
 
 def post_share(request: HttpRequest, post_id):
     ''' Функция для вывода формы и отправки email '''
