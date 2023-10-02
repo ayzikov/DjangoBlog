@@ -9,13 +9,31 @@
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Вывод сообщения о успешной регистрации -->
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+
     <div id="content">
         {% block content %}
         {% endblock %}
     </div>
+
+
     <div id="sidebar">
         <h2>My blog</h2>
         <p>Всего написанно постов: {% total_posts %}</p>
+        
+    <!-- проверка аунтификации пользователя -->
+        {% if user.is_authenticated %}
+            <h2>Привет {{ user.get_username }}!</h2>
+        <p><a href="{% url 'logout' %}">Выйти</a></p>
+        {% else %}
+            <h2><a href="{% url 'login' %}">Войдите</a> в систему</h2>
+        {% endif %}
         
         <h2>Последние посты</h2>
         {% show_latest_posts 2 %}

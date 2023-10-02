@@ -23,7 +23,7 @@ def show_latest_posts(count_posts=5):
 @register.inclusion_tag('blog/post/most_commented_posts.html')
 def get_most_commented_posts(count=5):
     most_commented_posts = Post.published.annotate(total_comments=Count('comments')
-                                                 ).order_by('-total_comments')[:count]
+                                                   ).order_by('-total_comments')[:count]
     return {'most_commented_posts': most_commented_posts}
 
 
@@ -31,3 +31,18 @@ def get_most_commented_posts(count=5):
 @register.filter(name='markdown')
 def markdown_format(text):
     return mark_safe(markdown.markdown(text))
+
+
+@register.filter
+def pluralize_ru(value, arg="пост,поста,постов"):
+    args = arg.split(",")
+    number = abs(int(value))
+    a = number % 10
+    b = number % 100
+
+    if (a == 1) and (b != 11):
+        return args[0]
+    elif (a >= 2) and (a <= 4) and ((b < 10) or (b >= 20)):
+        return args[1]
+    else:
+        return args[2]

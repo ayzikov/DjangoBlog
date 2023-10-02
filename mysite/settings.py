@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.postgres',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
 
@@ -131,7 +132,7 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# конфигурация для почты
+# Конфигурация для почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Конфигурация сервера электронной почты
@@ -140,3 +141,9 @@ EMAIL_HOST_USER = 'ayzikov1@gmail.com'
 EMAIL_HOST_PASSWORD = 'gkjn cwto olnv pumd'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# Перенаправление пользователя после входа
+LOGIN_REDIRECT_URL = '/blog/'
+
+# Устанавливаем время сеанса для пользователя в секундах
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30

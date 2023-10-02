@@ -1,6 +1,6 @@
 # импорты проекта
 from .models import Post
-from .forms import EmailPostForm, CommentPostForm
+from .forms import EmailPostForm, CommentPostForm, SearchForm
 from taggit.models import Tag
 
 # импорты джанго
@@ -11,6 +11,7 @@ from django.views.generic import ListView
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 
 
 def list_posts(request: HttpRequest, tag_slug=None):
@@ -131,6 +132,8 @@ def post_share(request: HttpRequest, post_id):
 
 @require_POST
 def post_comment(request: HttpRequest, post_id):
+    ''' Представление для создания комментариев '''
+
     post = get_object_or_404(Post,
                              id=post_id,
                              status=Post.Status.PUBLISHED)
@@ -157,7 +160,35 @@ def post_comment(request: HttpRequest, post_id):
                   )
 
 
+def post_search(request: HttpRequest):
+    form = SearchForm()
+    query = None
+    results = []
 
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            search_query = SearchQuery(query, config='russian')
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+
+            # почему то без этой строки не работает следующая 😐
+            test = Post.published.get(id=3)
+
+            # записываем в словарь все QS в у которых в одном из полей (title или body) было найдено слово (query)
+            # results = ((Post.published.
+            #            annotate(search=search_vector, rank=SearchRank(search_vector, search_query)).
+            #            filter(rank__gte=0.3)).
+            #            order_by('-rank'))
+
+            results = ((Post.published.
+                       annotate(similarity=TrigramSimilarity('title', query)).
+                       filter(similarity__gte=0.1)).
+                       order_by('-similarity'))
+
+    return render(request,
+                  'blog/post/search.html',
+                  {'form': form, 'query': query, 'results': results})
 
 
 
