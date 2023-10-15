@@ -1,12 +1,15 @@
 # файлы проекта
-from .forms import CustomUserCreationForm, CustomLoginForm
+from .forms import CustomUserCreationForm, CustomLoginForm, UpdateUserForm, UpdateProfileForm
 
 # файлы джанго
 from django.urls import reverse_lazy
 from django.views import generic
-from django.shortcuts import render, redirect, HttpResponse
-from django.contrib.auth.views import LoginView
+from django.shortcuts import render, redirect
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpRequest
 
 
 class SignUpView(generic.CreateView):
@@ -24,7 +27,7 @@ class SignUpView(generic.CreateView):
     # атрибут для задания начальных значений в полях формы (на данный момент не используется)
     initial = None
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
         '''
         Если пользователь попытается зайти на страницу регистрации после авторизации, то будет перенаправлен
         на главную страницу блога
@@ -45,7 +48,7 @@ class SignUpView(generic.CreateView):
                       template_name=self.template_name,
                       context={'form': form})
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs):
         ''' Если представление получает post запрост, то регистрирует пользователя и выводит ему начальную страницу '''
 
         # записываем в форму данные, которые ввел пользователь
@@ -99,9 +102,46 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
 
+@login_required
+def profile(request: HttpRequest):
+    '''
+    Вьюха для получения профиоля пользователя.
+    Декоратор не дает зайти на страницу профиля незарегестрированным пользователям.
+    При попытке невойденного пользователя зайти в профиль он будет перенаправлен на "LOGIN_URL" из settings.py
+    '''
+
+    if request.method == 'POST':
+
+        # Если POST запрос - принимаем данные из формы, прописываем instance так как форма ожидает определенный
+        # экземпляр модели
+        user_form = UpdateUserForm(data=request.POST,
+                                   instance=request.user)
+
+        profile_form = UpdateProfileForm(data=request.POST,
+                                         files=request.FILES,
+                                         instance=request.user.profile)
+
+        # после проверки на валидность, сохраняем формы и выводим сообщение об успешном успехе
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, message='Ваш профиль был успешно обновлен')
+            return redirect(to='accounts:profile')
+
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+        profile_form = UpdateProfileForm(instance=request.user.profile)
+
+    return render(request=request,
+                  template_name='registration/profile.html',
+                  context={'user_form': user_form, 'profile_form': profile_form})
 
 
 
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'registration/password_change.html'
+    success_message = 'Ваш пароль был успешно изменен'
+    success_url = reverse_lazy('login')
 
 
 

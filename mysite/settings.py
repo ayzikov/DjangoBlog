@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.postgres',
     'accounts.apps.AccountsConfig',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -135,7 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Конфигурация для почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Конфигурация сервера электронной почты
+# Конфигурация сервера электронной почты (gmail)
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'ayzikov1@gmail.com'
 EMAIL_HOST_PASSWORD = 'gkjn cwto olnv pumd'
@@ -143,7 +146,33 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Перенаправление пользователя после входа
-LOGIN_REDIRECT_URL = '/blog/'
+# LOGIN_REDIRECT_URL = '/blog/'
 
 # Устанавливаем время сеанса для пользователя в секундах
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
+
+# директория для хранения медиафайлов
+MEDIA_ROOT = BASE_DIR / 'media'
+# url по которому можно получить доступ к медиафайлам
+MEDIA_URL = '/media/'
+
+# Сервера для OAuth 2.0
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.vk.VKOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',  # бекенд классической аутентификации, чтобы работала авторизация через обычный логин и пароль
+)
+
+# SOCIAL_AUTH_VK_OAUTH2_AUTH_PARAMS = {
+#     'redirect_uri': 'http://localhost:8000/oauth/login/vk-oauth2/'
+# }
+
+# настройки для авторизации ВК
+SOCIAL_AUTH_VK_OAUTH2_KEY = '51765633'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'ouAYngbTs88EZMMc4Xl4'
+SOCIAL_AUTH_VK_APP_USER_MODE = 2
+
+# При использовании PostgreSQL рекомендуется использовать встроенное поле JSONB для хранения извлеченных дополнительных_данных.
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True

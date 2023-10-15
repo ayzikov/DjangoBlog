@@ -14,6 +14,9 @@ urlpatterns = [
 
     # тут мы изменяем класс, который отвечает за выход пользователя из системы добавляя ему шаблон
     path('logout/', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
+
+    path('profile/', views.profile, name='profile'),
+    path('password_change/', views.CustomPasswordChangeView.as_view(), name='password_change')
 ]
 
 app_name = 'accounts'

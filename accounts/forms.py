@@ -1,3 +1,6 @@
+# импорты проекта
+from .models import Profile
+
 # импорты джанго
 from django import forms
 from django.contrib.auth.models import User
@@ -37,3 +40,26 @@ class CustomLoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ('username', 'password', 'remember_me')
+
+
+class UpdateProfileForm(forms.ModelForm):
+    ''' Обновление профиля пользователя '''
+    avatar = forms.ImageField(widget=forms.FileInput())
+    bio = forms.CharField(widget=forms.Textarea(attrs={'rows': 5}))
+
+    class Meta:
+        model = Profile
+        fields = ['avatar', 'bio']
+
+
+class UpdateUserForm(forms.ModelForm):
+    ''' Обновление информации о пользователе '''
+    username = forms.CharField(max_length=100,
+                               required=True,
+                               widget=forms.TextInput())
+    email = forms.EmailField(required=True,
+                             widget=forms.TextInput())
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
