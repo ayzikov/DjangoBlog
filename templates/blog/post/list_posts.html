@@ -29,7 +29,7 @@
     </p>
 
     <h3>
-        {{ post.body|markdown|truncatewords_html:30 }}
+        {{ post.body|markdown|truncatewords_html:30|safe }}
     </h3>
     {% endfor %}
 

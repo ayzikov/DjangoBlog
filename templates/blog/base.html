@@ -5,6 +5,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Подключаем библиотеку -->
+    {% load django_bootstrap5 %}
+
+    <!-- Подключаем JS и CSS -->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
     <title>{% block title %}{% endblock %}</title>
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
 </head>
@@ -24,23 +31,30 @@
 
 
     <div id="sidebar">
-        <h2>My blog</h2>
+        <h2>Мой блог</h2>
         <p>Всего написанно постов: {% total_posts %}</p>
         
     <!-- проверка аунтификации пользователя -->
-        {% if user.is_authenticated %}
-        Hi {{ user.username }}!
+    {% if user.is_authenticated %}
+        {% if user.first_name %}
+            Привет {{ user.first_name }}
+        {% else %}
+            Привет {{ user.username }}
+        {% endif %}
+        
         <p><a href="{% url 'accounts:profile' %}">Мой профиль</a></p>
         <p><a href="{% url 'accounts:logout' %}">Выйти</a></p>
     {% else %}
-        <p>You are not logged in</p>
+        <p>Вы не авторизованы</p>
         <p><a href="{% url 'accounts:login' %}">Войти</a></p>
         <p><a href="{% url 'accounts:password_change' %}">Забыли пароль?</a></p>
     {% endif %}
-        
+
+        <!-- Последние написанные посты -->
         <h2>Последние посты</h2>
         {% show_latest_posts 2 %}
         
+        <!-- Посты с наибольшим количеством комментариев посты -->
         <h2>Самые заккоментированные посты</h2>
         {% get_most_commented_posts 2 %}
     </div>

@@ -2,6 +2,8 @@ from .models import Comment
 
 from django import forms
 
+from django_summernote.widgets import SummernoteWidget
+
 
 class EmailPostForm(forms.Form):
     name = forms.CharField()
@@ -12,6 +14,8 @@ class EmailPostForm(forms.Form):
 
 
 class CommentPostForm(forms.ModelForm):
+    body = forms.CharField(required=True,
+                           widget=SummernoteWidget())
     class Meta:
         model = Comment
         fields = ['name', 'email', 'body']

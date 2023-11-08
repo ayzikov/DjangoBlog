@@ -43,7 +43,7 @@
                 {{ comment.name }} |
                 {{ comment.created }}
             </p>
-            {{ comment.body|linebreaks }}
+            {{ comment.body|safe }}
         </div>
     {% empty %}
         <p>Комментариев пока нет</p>

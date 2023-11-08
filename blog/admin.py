@@ -1,8 +1,9 @@
+from django_summernote.admin import SummernoteModelAdmin
 from django.contrib import admin
 from .models import Post, Comment
 
 @admin.register(Post)
-class AdminPost(admin.ModelAdmin):
+class AdminPost(SummernoteModelAdmin):
     # определяет какие поля отображаются в админ-панели
     list_display = ['title', 'slug', 'author', 'publish', 'status']
     # определяет боковую панель с полями по которым можно включить фильтрацию
@@ -17,10 +18,13 @@ class AdminPost(admin.ModelAdmin):
     date_hierarchy = 'publish'
     # все посты будут автоматически сортироваться по статусу и по дате публикации
     ordering = ['status', 'publish']
+    # поля в которых необходим редактор
+    summernote_fields = ('body',)
 
 
 @admin.register(Comment)
-class AdminComment(admin.ModelAdmin):
+class AdminComment(SummernoteModelAdmin):
     list_display = ['id', 'name', 'post', 'created', 'active']
     list_filter = ['active', 'created', 'updated']
     search_fields = ['name', 'email', 'body']
+    summernote_fields = ('body',)
