@@ -20,7 +20,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['blogdj.ru']
+
+# Список доменов, которые Django будет считать доверенными для CSRF-проверки.
+CSRF_TRUSTED_ORIGINS = ['http://blogdj.ru', 'https://blogdj.ru']
 
 SITE_ID = 1
 
@@ -119,6 +122,12 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+
+# директория для хранения медиафайлов
+MEDIA_ROOT = BASE_DIR / 'media'
+# url по которому можно получить доступ к медиафайлам
+MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -137,11 +146,6 @@ LOGIN_REDIRECT_URL = '/blog/'
 
 # Устанавливаем время сеанса для пользователя в секундах
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
-
-# директория для хранения медиафайлов
-MEDIA_ROOT = BASE_DIR / 'media'
-# url по которому можно получить доступ к медиафайлам
-MEDIA_URL = '/media/'
 
 # Сервера для OAuth 2.0
 AUTHENTICATION_BACKENDS = (

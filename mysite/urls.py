@@ -9,7 +9,7 @@ sitemaps = {
     'posts': PostSitemap,
 }
 
-urlpatterns = [
+urlpatterns = ([
     path('admin/', admin.site.urls),
     path('blog/', include('blog.urls', namespace='blog')),
     path('accounts/', include('accounts.urls', namespace='accounts')),
@@ -21,3 +21,4 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     re_path(r'^oauth/', include('social_django.urls', namespace='social'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
