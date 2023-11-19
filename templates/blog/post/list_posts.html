@@ -4,34 +4,25 @@
 {% block title %}My Blog{% endblock %}
 
 {% block content %}
-    <h1>My Blog</h1>
-
-    {% if tag %}
-    <h2>Фильтрация по тегу: {{ tag.name }}</h2>
-    {% endif %}
-
+<!-- Список постов -->
+<div class="list-group">
     {% for post in page_obj %}
-
-    <h2>
-        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-    </h2>
-
-    <p class="tags">
-        Теги:
-        {% for tag in post.tag.all %}
-            <a href="{% url 'blog:post_list_tag_filter' tag %}">{{ tag }}</a>
+        <div class="list-group-item list-group-item-my list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <a href="{{ post.get_absolute_url }}" class="mb-1"><h5>{{ post.title }}</h5></a>
+                <small class="text-muted">{{ post.publish }} {{ post.author }}</small>
+            </div>
+            <p class="mb-1">{{ post.body|markdown|truncatewords_html:15|safe }}</p>
+            Теги:
+            {% for tag in post.tag.all %}
+                <a href="{% url 'blog:post_list_tag_filter' tag %}">{{ tag }}</a>
             {% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-
-    <p class="date">
-        Published {{ post.publish }} by {{ post.author }}
-    </p>
-
-    <h3>
-        {{ post.body|markdown|truncatewords_html:30|safe }}
-    </h3>
+            {% endfor %}
+        </div>
     {% endfor %}
+</div>
 
-    {% include "paginator.html" with page_obj=page_obj %}
+<!-- Пагинация (постраничная разбивка) -->
+{% include "paginator.html" with page_obj=page_obj %}
+
 {% endblock %}

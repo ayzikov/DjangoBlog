@@ -17,5 +17,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
          name='django.contrib.sitemaps.views.sitemap'),
     path('summernote/', include('django_summernote.urls')),
+    path('api/', include('blog_api.urls', namespace='blog_api')),
+    path("api-auth/", include("rest_framework.urls")),
     re_path(r'^oauth/', include('social_django.urls', namespace='social'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

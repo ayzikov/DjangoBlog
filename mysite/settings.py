@@ -1,3 +1,6 @@
+from django.contrib.messages import constants as messages
+
+
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -39,6 +42,12 @@ INSTALLED_APPS = [
     'social_django',
     'django_summernote',
     'django_bootstrap5',
+    'widget_tweaks',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'blog_api.apps.BlogApiConfig',
+    'django_filters',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -74,9 +83,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -86,9 +92,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,9 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -118,16 +118,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = '/static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Конфигурация для почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -140,7 +133,7 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
 
 # Перенаправление пользователя после входа
-# LOGIN_REDIRECT_URL = '/blog/'
+LOGIN_REDIRECT_URL = '/blog/'
 
 # Устанавливаем время сеанса для пользователя в секундах
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
@@ -159,9 +152,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # бекенд классической аутентификации, чтобы работала авторизация через обычный логин и пароль
 )
 
-# SOCIAL_AUTH_VK_OAUTH2_AUTH_PARAMS = {
-#     'redirect_uri': 'http://localhost:8000/oauth/login/vk-oauth2/'
-# }
 
 # настройки для авторизации ВК
 SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_VK_OAUTH2_KEY')
@@ -176,3 +166,37 @@ SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 # Эта настройка контролирует, как библиотека social-auth-app-django обрабатывает поля JSON в моделях.
 # Если эта настройка включена, библиотека будет использовать JSONField из Django для хранения данных в формате JSON.
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
+
+# Включаем тему bootstrap5 в SUMMERNOTE
+SUMMERNOTE_THEME = 'bs5'
+
+# Добавляю настройку при которой message.tags.error = danger. Сделано потому что при отображении сообщений в
+# bootstrap5 красный цвет у плашки у сообщения с классом danger
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
+
+# Настройки для DRF
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Описание документации API
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Blog API Project",
+    "DESCRIPTION": "A sample blog to learn about DRF",
+    "VERSION": "1.0.0",
+}

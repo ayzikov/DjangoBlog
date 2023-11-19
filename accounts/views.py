@@ -10,6 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpRequest
+from django.contrib.auth import logout
 
 
 class SignUpView(generic.CreateView):
@@ -84,7 +85,7 @@ class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
 
     def form_valid(self, form):
-        ''' метод вызывается при успешной валидации формы '''
+        ''' Метод вызывается при успешной валидации формы '''
         remember_me = form.cleaned_data.get('remember_me')
 
         # если пользователь не поставил галочку "Запомнить меня"
@@ -101,6 +102,12 @@ class CustomLoginView(LoginView):
         # определенное в settings.py
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        ''' Метод вызывается при вводе неправильного логина или пароля '''
+        response = super().form_invalid(form)
+        messages.error(self.request, 'Неправильный логин или пароль')
+        return response
+
 
 @login_required
 def profile(request: HttpRequest):
@@ -110,6 +117,7 @@ def profile(request: HttpRequest):
     При попытке невойденного пользователя зайти в профиль он будет перенаправлен на "LOGIN_URL" из settings.py
     '''
 
+    # если пользователь отредактировал профиль и нажал 'сохранить'
     if request.method == 'POST':
 
         # Если POST запрос - принимаем данные из формы, прописываем instance так как форма ожидает определенный
@@ -128,6 +136,7 @@ def profile(request: HttpRequest):
             messages.success(request, message='Ваш профиль был успешно обновлен')
             return redirect(to='accounts:profile')
 
+    # если пользователь нажал на свой профиль на нав-баре
     else:
         user_form = UpdateUserForm(instance=request.user)
         profile_form = UpdateProfileForm(instance=request.user.profile)
@@ -139,9 +148,18 @@ def profile(request: HttpRequest):
 
 
 class CustomPasswordChangeView(PasswordChangeView):
+    ''' Представление для смены пароля '''
     template_name = 'registration/password_change.html'
     success_message = 'Ваш пароль был успешно изменен'
+
+    # при успешной смене пароля пользователь выходит из системы и будет перенаправлен на url accounts:login
     success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        logout(self.request)
+        messages.success(self.request, 'Ваш пароль был успешно изменен')
+        return super().form_valid(form)
+
 
 
 

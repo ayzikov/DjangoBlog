@@ -1,20 +1,23 @@
 {% extends "blog/base.html" %}
 
-{% block title %}Share a post{% endblock %}
+{% block title %}Поделиться{% endblock %}
 
 {% block content %}
     {% if sent %}
-        <h1>Письмо успешно отправлено</h1>
+        <h1>E-mail успешно отправлен</h1>
         <p>
-            "{{ post.title }}" письмо успешно отправлено
-            по адресу {{ form.cleaned_data.to_email }}.
+            "{{ post.title }}" успешно отправлен
+            на почту {{ form.cleaned_data.to_email }}.
         </p>
     {% else %}
-        <h1>Отправить "{{ post.title }}" по почте</h1>
+        <h1>Отправить "{{ post.title }}"</h1>
         <form method="post">
-            {{ form.as_p }}
+            {{ form.name }}
+            {{ form.from_email }}
+            {{ form.to_email }}
+            {{ form.comment }}
             {% csrf_token %}
-            <input type="submit" value="Отправить письмо">
+            <input type="submit" value="Отправить" class="btn btn-primary mb-3 btn-lg">
         </form>
     {% endif %}
 {% endblock %}

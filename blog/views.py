@@ -1,6 +1,6 @@
 # импорты проекта
 from .models import Post
-from .forms import EmailPostForm, CommentPostForm, SearchForm
+from .forms import EmailPostForm, CommentPostForm
 from taggit.models import Tag
 
 # импорты джанго
@@ -161,34 +161,22 @@ def post_comment(request: HttpRequest, post_id):
 
 
 def post_search(request: HttpRequest):
-    form = SearchForm()
-    query = None
     results = []
 
     if 'query' in request.GET:
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            query = form.cleaned_data['query']
-            search_query = SearchQuery(query, config='russian')
-            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+        query = request.GET.get('query')
 
-            # почему то без этой строки не работает следующая 😐
-            test = Post.published.get(id=3)
+        # почему то без этой строки не работает следующая 😐
+        test = Post.published.get(id=3)
 
-            # записываем в словарь все QS в у которых в одном из полей (title или body) было найдено слово (query)
-            # results = ((Post.published.
-            #            annotate(search=search_vector, rank=SearchRank(search_vector, search_query)).
-            #            filter(rank__gte=0.3)).
-            #            order_by('-rank'))
+        results = ((Post.published.
+                   annotate(similarity=TrigramSimilarity('title', query)).
+                   filter(similarity__gte=0.1)).
+                   order_by('-similarity'))
 
-            results = ((Post.published.
-                       annotate(similarity=TrigramSimilarity('title', query)).
-                       filter(similarity__gte=0.1)).
-                       order_by('-similarity'))
-
-    return render(request,
-                  'blog/post/search.html',
-                  {'form': form, 'query': query, 'results': results})
+        return render(request,
+                      'blog/post/search.html',
+                      {'query': query, 'results': results})
 
 
 

@@ -1,7 +1,8 @@
-<ul>
- {% for post in most_commented_posts %}
- <li>
-    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
- </li>
- {% endfor %}
-</ul>
+<div class="list-group">
+      <div class="list-group-item active">
+            Самые закомментированные посты
+      </div>
+      {% for post in most_commented_posts %}
+            <a href="{{ post.get_absolute_url }}" class="list-group-item list-group-item-action">{{ post.title }}</a>
+      {% endfor %}
+</div>

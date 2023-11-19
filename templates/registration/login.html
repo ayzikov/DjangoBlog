@@ -1,21 +1,23 @@
 {% extends "blog/base.html" %}
 {% block title %} Вход {% endblock %}
 {% block content %}
-    <h2> Вход </h2>
-    <!-- Вход через вк -->
-    <a href="{% url 'social:begin' 'vk-oauth2' %}">Войти через ВК</a>
-    <br>
-    <a href="{% url 'social:begin' 'github' %}">Войти через GitHub</a>
+    <div class="col-md-6 mx-auto">
+        <h2> Вход </h2>
+        <!-- Вход через вк -->
+        <a href="{% url 'accounts:signup'  %}" class="btn btn-link btn-lg active btn-block">Зарегистрироваться</a>
+        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="btn btn-link btn-lg active btn-block">Войти через ВК</a>
+        <a href="{% url 'social:begin' 'github' %}" class="btn btn-link btn-lg active btn-block">Войти через GitHub</a>
 
-    <!-- форма для входа -->
-    <form method="post">
-        <p>Имя пользователя: {{ form.username }}</p>
-        <p>Пароль: {{ form.password }}</p>
-        <p>Запомнить меня: {{ form.remember_me }}</p>
-        {% csrf_token %}
-        <p><input type="submit" value="Вход"></p>
-    </form>
+        <!-- форма для входа -->
+        <form method="post" class="form">
+            {{ form.username }}
+            {{ form.password }}
+            <div class="mb-1">Запомнить меня: {{ form.remember_me }}</div>
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary btn-lg" value="Войти">
+        </form>
 
-    <!-- Кнопка для сброса пароля -->
-    <a href="{% url 'password_reset' %}">Я забыл(а) пароль</a>
+        <!-- Кнопка для сброса пароля -->
+        <a href="{% url 'password_reset' %}">Я забыл(а) пароль</a>
+    </div>
 {% endblock %}

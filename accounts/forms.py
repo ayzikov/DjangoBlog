@@ -11,12 +11,23 @@ from django_summernote.widgets import SummernoteWidget
 
 class CustomUserCreationForm(UserCreationForm):
     ''' Класс для создания формы регистрации пользователя '''
-    first_name = forms.CharField(max_length=100)
-    last_name = forms.CharField(max_length=100)
-    username = forms.CharField(max_length=100)
-    email = forms.EmailField()
-    password1 = forms.CharField(max_length=50, widget=forms.PasswordInput())
-    password2 = forms.CharField(max_length=50, widget=forms.PasswordInput())
+    first_name = forms.CharField(max_length=100,
+                                 widget=forms.TextInput(attrs={"class": "form-control mb-1", 'placeholder': 'Имя'}))
+
+    last_name = forms.CharField(max_length=100,
+                                widget=forms.TextInput(attrs={"class": "form-control mb-1", 'placeholder': 'Фамилия'}))
+
+    username = forms.CharField(max_length=100,
+                               widget=forms.TextInput(
+                                   attrs={"class": "form-control mb-1", 'placeholder': 'Имя пользователя'}))
+
+    email = forms.EmailField(widget=forms.TextInput(attrs={"class": "form-control mb-1", 'placeholder': 'Email'}))
+
+    password1 = forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={"class": "form-control mb-1", 'placeholder': 'Пароль'}))
+
+    password2 = forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={"class": "form-control mb-1", 'placeholder': 'Подтверждение пароля'}))
 
     class Meta:
         model = User
@@ -31,10 +42,12 @@ class CustomLoginForm(AuthenticationForm):
     # серого текста в поле формы перед тем как пользователь начнет вводить туда свои данные
     username = forms.CharField(max_length=100,
                                required=True,
-                               widget=forms.TextInput(attrs={'placeholder': 'введите имя пользователя'}))
+                               widget=forms.TextInput(
+                                   attrs={"class": "form-control mb-1", 'placeholder': 'Имя пользователя'}))
     password = forms.CharField(max_length=50,
                                required=True,
-                               widget=forms.PasswordInput(attrs={'placeholder': 'введите пароль'}))
+                               widget=forms.PasswordInput(
+                                   attrs={"class": "form-control mb-1", 'placeholder': 'Пароль'}))
 
     # initial=True указывает начальное значение для этого поля
     remember_me = forms.BooleanField(required=False, initial=True)
@@ -46,8 +59,10 @@ class CustomLoginForm(AuthenticationForm):
 
 class UpdateProfileForm(forms.ModelForm):
     ''' Обновление профиля пользователя '''
-    avatar = forms.ImageField(widget=forms.FileInput())
-    bio = forms.CharField(widget=SummernoteWidget())
+    avatar = forms.ImageField(required=False,
+                              widget=forms.FileInput())
+    bio = forms.CharField(required=False,
+                          widget=SummernoteWidget(attrs={'summernote': {'width': '100%', 'height': '350px'}}))
 
     class Meta:
         model = Profile
@@ -59,9 +74,15 @@ class UpdateUserForm(forms.ModelForm):
     username = forms.CharField(max_length=100,
                                required=True,
                                widget=forms.TextInput())
+    first_name = forms.CharField(max_length=100,
+                                 required=False,
+                                 widget=forms.TextInput())
+    last_name = forms.CharField(max_length=100,
+                                required=False,
+                                widget=forms.TextInput())
     email = forms.EmailField(required=True,
                              widget=forms.TextInput())
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', 'first_name', 'last_name']
