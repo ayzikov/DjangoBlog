@@ -99,7 +99,7 @@ class CustomLoginView(LoginView):
             self.request.session.modified = True
 
         # в противном случае сеанс браузера будет таким же как время сеанса cookie "SESSION_COOKIE_AGE",
-        # определенное в settings.py
+        # определенное в settings_prod.py
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -114,7 +114,7 @@ def profile(request: HttpRequest):
     '''
     Вьюха для получения профиоля пользователя.
     Декоратор не дает зайти на страницу профиля незарегестрированным пользователям.
-    При попытке невойденного пользователя зайти в профиль он будет перенаправлен на "LOGIN_URL" из settings.py
+    При попытке невойденного пользователя зайти в профиль он будет перенаправлен на "LOGIN_URL" из settings_prod.py
     '''
 
     # если пользователь отредактировал профиль и нажал 'сохранить'
