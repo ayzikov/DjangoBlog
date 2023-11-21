@@ -18,16 +18,12 @@ class EmailPostForm(forms.Form):
 
 
 class CommentPostForm(forms.ModelForm):
-    name = forms.CharField(required=True,
-                           widget=forms.TextInput(attrs={"class": "form-control", 'placeholder': 'Name'}))
-    email = forms.EmailField(required=True,
-                             widget=forms.EmailInput(attrs={"class": "form-control", 'placeholder': 'Email'}))
     body = forms.CharField(required=True,
                            widget=SummernoteWidget(
                                attrs={"class": "form-control", 'summernote': {'width': '100%', 'height': '300px'}}))
 
     class Meta:
         model = Comment
-        fields = ['name', 'email', 'body']
+        fields = ['body']
 
 

@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from django.db.models import Count
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+from django.contrib.auth.models import User
 
 
 def list_posts(request: HttpRequest, tag_slug=None):
@@ -131,16 +132,18 @@ def post_share(request: HttpRequest, post_id):
 
 
 @require_POST
-def post_comment(request: HttpRequest, post_id):
+def post_comment(request: HttpRequest, post_id, user_id):
     ''' Представление для создания комментариев '''
 
     post = get_object_or_404(Post,
                              id=post_id,
                              status=Post.Status.PUBLISHED)
+    user = get_object_or_404(User,
+                             id=user_id)
 
     comment = None
 
-    # получаем экземпляр формы с данными которые ввел пользователь
+    # получаем экземпляр формы с комментарием который ввел пользователь
     form = CommentPostForm(request.POST)
 
     if form.is_valid():
@@ -149,6 +152,15 @@ def post_comment(request: HttpRequest, post_id):
 
         # добавляем пост к комментарию
         comment.post = post
+
+        # добавляем имя пользователя к комментарию
+        try:
+            comment.name = user.first_name
+        except:
+            comment.name = user.username
+
+        # добавляем email пользователя к комментарию
+        comment.email = user.email
 
         # сохраняем в БД
         comment.save()

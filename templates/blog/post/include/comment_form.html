@@ -1,16 +1,16 @@
-<form action="{% url 'blog:post_comment' post.id %}" method="post">
-    {% csrf_token %}
-    <div class="row">
-        <h3>Добавить комментарий</h3>
-        <div class="col mt-2">
-            {{ form.name }}
+{% if user.is_authenticated  %}
+    <form action="{% url 'blog:post_comment' post.id user.id %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <h3>Добавить комментарий</h3>
+            <div class="mt-2">
+                {{ form.body }}
+                    <input type="submit" class="btn btn-primary mb-3" value="Добавить">
+            </div>
         </div>
-        <div class="col mt-2">
-            {{ form.email }}
-        </div>
-        <div class="mt-2">
-            {{ form.body }}
-            <input type="submit" class="btn btn-primary mb-3" value="Добавить">
-        </div>
-    </div>
-</form>
+    </form>
+{% else %}
+    <a class="btn btn-primary float-left mb-3 mt-3" href="{% url 'accounts:login' %}">
+        Войдите чтобы оставить комментарий
+    </a>
+{% endif %}
