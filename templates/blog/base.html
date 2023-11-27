@@ -17,6 +17,7 @@
 
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
 
+
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -116,6 +117,11 @@
 
             <!-- Виджет с самыми заккоментированными постами -->
             {% get_most_commented_posts 3 %}
+
+            <!-- Кнопка для добавления нового поста -->
+            <a class="btn btn-primary float-left" href="{% url 'blog:add_post' user.id %}">
+                Добавить пост
+            </a>
         </div>
    </div>
 </div>

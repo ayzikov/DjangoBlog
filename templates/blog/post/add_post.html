@@ -1,0 +1,14 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Поделиться{% endblock %}
+
+{% block content %}
+    <h1>Добавить новый пост</h1>
+    <form method="post">
+            {{ form.title }}
+            {{ form.body }}
+            {{ form.tag }}
+            {% csrf_token %}
+            <input type="submit" value="Добавить" class="btn btn-primary mb-3 btn-lg">
+        </form>
+{% endblock %}

@@ -1,8 +1,8 @@
-from .models import Comment
+from .models import Comment, Post
 
 from django import forms
-
 from django_summernote.widgets import SummernoteWidget
+from taggit.forms import TagWidget
 
 
 class EmailPostForm(forms.Form):
@@ -25,5 +25,16 @@ class CommentPostForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['body']
+
+
+class AddPostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'body', 'tag']
+        widgets = {
+            'body': SummernoteWidget(attrs={"class": "form-control", 'summernote': {'width': '100%', 'height': '300px'}}),
+            'title': forms.TextInput(attrs={"class": "form-control mb-1", 'placeholder': 'Заголовок'}),
+            'tag': TagWidget(attrs={"class": "form-control mb-1", 'placeholder': 'Добавте теги через запятую'})
+        }
 
 

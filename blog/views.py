@@ -1,6 +1,6 @@
 # импорты проекта
 from .models import Post
-from .forms import EmailPostForm, CommentPostForm
+from .forms import EmailPostForm, CommentPostForm, AddPostForm
 from taggit.models import Tag
 
 # импорты джанго
@@ -191,6 +191,26 @@ def post_search(request: HttpRequest):
                       {'query': query, 'results': results})
 
 
+
+def add_post(request: HttpRequest, user_id):
+    ''' Функция для добавления нового поста '''
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = user
+            post.save()
+            form.save_m2m()
+
+    else:
+        form = AddPostForm()
+    return render(request,
+                  'blog/post/add_post.html',
+                  {'form': form}
+                  )
 
 
 

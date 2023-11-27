@@ -1,4 +1,5 @@
 from taggit.managers import TaggableManager
+from slugify import slugify
 
 from django.db import models
 from django.utils import timezone
@@ -50,7 +51,7 @@ class Post(models.Model):
     publish = models.DateTimeField(default=timezone.now())
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
+    status = models.CharField(max_length=2, choices=Status.choices, default=Status.PUBLISHED)
 
     tag = TaggableManager(blank=True)
 
@@ -69,6 +70,12 @@ class Post(models.Model):
                              ])
     def __str__(self):
         return self.title
+
+    # Переопределяем функцию save чтобы при сохранении проверялось поле slug и если его нет,
+    # то оно добавится автоматически
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(Post, self).save(*args, **kwargs)
 
 
 class Comment(models.Model):
