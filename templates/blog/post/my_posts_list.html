@@ -1,0 +1,41 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+
+{% block title %}My Blog{% endblock %}
+
+{% block content %}
+
+{% if not page_obj %}
+    <h1>У вас пока нет ни одного поста</h1>
+{% else %}
+    <!-- Список постов -->
+    <div class="list-group mb-3">
+        {% for post in page_obj %}
+            <div class="list-group-item list-group-item-my list-group-item-action">
+                <!-- Название поста, время добавления и его автор -->
+                <div class="d-flex w-100 justify-content-between">
+                    <a href="{{ post.get_absolute_url }}" class="mb-1"><h5>{{ post.title }}</h5></a>
+                    <small class="text-muted">{{ post.publish }} {{ post.author }}</small>
+                </div>
+                <!-- Начало основного текста поста -->
+                <p class="mb-1">{{ post.body|markdown|truncatewords_html:15|safe }}</p>
+
+                <!-- Если есть теги, то их вывод -->
+                {% if post.tag.all %}
+                    Теги:
+                    {% for tag in post.tag.all %}
+                        <a href="{% url 'blog:post_list_tag_filter' tag %}">{{ tag }}</a>
+                    {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация (постраничная разбивка) -->
+    {% include "paginator.html" with page_obj=page_obj %}
+
+{% endif %}
+
+{% endblock %}

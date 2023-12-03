@@ -4,7 +4,12 @@
 {% block title %}My Blog{% endblock %}
 
 {% block content %}
+
 <!-- Список постов -->
+{% if tag %}
+    <h1>Посты содержащие тег: {{ tag }}</h1>
+{% endif %}
+
 <div class="list-group mb-3">
     {% for post in page_obj %}
         <div class="list-group-item list-group-item-my list-group-item-action">
@@ -15,7 +20,7 @@
             </div>
             <!-- Начало основного текста поста -->
             <p class="mb-1">{{ post.body|markdown|truncatewords_html:15|safe }}</p>
-            
+
             <!-- Если есть теги, то их вывод -->
             {% if post.tag.all %}
                 Теги:
@@ -24,7 +29,7 @@
                 {% if not forloop.last %}, {% endif %}
                 {% endfor %}
             {% endif %}
-            
+
         </div>
     {% endfor %}
 </div>

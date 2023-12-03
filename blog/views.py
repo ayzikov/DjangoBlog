@@ -221,4 +221,16 @@ def add_post(request: HttpRequest, user_id):
                   )
 
 
+def my_posts_list(request: HttpRequest, user_id):
+    ''' Функция для отображения списка постов пользователя '''
+    posts = Post.published.published().filter(author__pk=user_id)
+
+    paginator = Paginator(posts, 3)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    return render(request,
+                  'blog/post/my_posts_list.html',
+                  {'page_obj': page_obj})
+
 

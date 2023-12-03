@@ -120,10 +120,19 @@
 
             <!-- Кнопка для добавления нового поста -->
             {% if user.is_authenticated  %}
-                <a class="btn btn-primary float-left" href="{% url 'blog:add_post' user.id %}">
-                    Добавить пост
-                </a>
+                <div class="mb-4">
+                    <a class="btn btn-primary w-100" href="{% url 'blog:add_post' user.id %}">
+                        Добавить пост
+                    </a>
+                </div>
+
+                <div class="mb-4">
+                    <a class="btn btn-primary w-100" href="{% url 'blog:my_posts_list' user.id %}">
+                        Мои посты
+                    </a>
+                </div>
             {% endif %}
+
         </div>
    </div>
 </div>

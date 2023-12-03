@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:post_id>/<int:user_id>/comment/', views.post_comment, name='post_comment'),
     path('search/', views.post_search, name='post_search'),
     path('<int:user_id>/add_post/', views.add_post, name='add_post'),
+    path('<int:user_id>/my_posts_list/', views.my_posts_list, name='my_posts_list'),
 ]
 
 app_name = 'blog'
