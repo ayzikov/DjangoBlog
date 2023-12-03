@@ -119,9 +119,11 @@
             {% get_most_commented_posts 3 %}
 
             <!-- Кнопка для добавления нового поста -->
-            <a class="btn btn-primary float-left" href="{% url 'blog:add_post' user.id %}">
-                Добавить пост
-            </a>
+            {% if user.is_authenticated  %}
+                <a class="btn btn-primary float-left" href="{% url 'blog:add_post' user.id %}">
+                    Добавить пост
+                </a>
+            {% endif %}
         </div>
    </div>
 </div>

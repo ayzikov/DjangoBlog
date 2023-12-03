@@ -4,15 +4,16 @@ from .forms import EmailPostForm, CommentPostForm, AddPostForm
 from taggit.models import Tag
 
 # импорты джанго
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
-from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
 from django.db.models import Count
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 def list_posts(request: HttpRequest, tag_slug=None):
@@ -196,17 +197,24 @@ def add_post(request: HttpRequest, user_id):
     ''' Функция для добавления нового поста '''
     user = get_object_or_404(User, id=user_id)
 
+    # Если это POST запрос
     if request.method == 'POST':
         form = AddPostForm(request.POST)
 
+        # Проверяем форму на правильность, сохраняем ее, добавляем сообщение об успехе и делаем редирект на главную страницу
         if form.is_valid():
+
             post = form.save(commit=False)
             post.author = user
             post.save()
             form.save_m2m()
 
+            messages.success(request, message='Пост был успешно добавлен')
+            return redirect(to='blog:post_list')
+
     else:
         form = AddPostForm()
+
     return render(request,
                   'blog/post/add_post.html',
                   {'form': form}
