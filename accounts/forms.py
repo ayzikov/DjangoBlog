@@ -3,10 +3,14 @@ from .models import Profile
 
 # импорты джанго
 from django import forms
+from django.core.files import File
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from django_summernote.widgets import SummernoteWidget
+
+from PIL import Image
+from io import BytesIO
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -63,6 +67,31 @@ class UpdateProfileForm(forms.ModelForm):
                               widget=forms.FileInput())
     bio = forms.CharField(required=False,
                           widget=SummernoteWidget(attrs={'summernote': {'width': '100%', 'height': '350px'}}))
+
+    # Переопределяем метод save чтобы изображение загруженное пользователем не теряло качество
+    def save(self, commit=True):
+        # Сохраняем экземпляр формы без сохранения в базе данных
+        instance = super().save(commit=False)
+
+        # Проверяем, есть ли изображение в форме
+        if self.cleaned_data['avatar']:
+            # Открываем изображение
+            avatar = Image.open(self.cleaned_data['avatar'])
+            if avatar.height > 300 or avatar.width > 300:
+                output_size = (300, 300)
+                avatar.thumbnail(output_size)
+
+                # Создание файла из изображения который можно сохранить в джанго
+                avatar_io = BytesIO()
+
+                # Сохраняем изображение в объект BytesIO
+                avatar.save(avatar_io, format='JPEG', quality=90)
+
+                # Сохраняем изображение в поле avatar экземпляра формы
+                instance.avatar.save(f'{instance.user.username}_avatar.jpg', File(avatar_io), save=False)
+
+        if commit:
+            instance.save()
 
     class Meta:
         model = Profile

@@ -16,13 +16,3 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-    def save(self, *args, **kwargs):
-        ''' Проверяем если фотка больше чем 100 на 100, то делаем ее такой и сохраняем по тому же пути '''
-        super().save()
-
-        img = Image.open(self.avatar.path)
-
-        if img.height > 100 or img.width > 100:
-            new_size = (100, 100)
-            img.thumbnail(new_size)
-            img.save(self.avatar.path)
