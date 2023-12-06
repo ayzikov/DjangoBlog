@@ -6,11 +6,18 @@ from django import forms
 from django.core.files import File
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.files.storage import default_storage
 
 from django_summernote.widgets import SummernoteWidget
 
 from PIL import Image
 from io import BytesIO
+
+import os
+import sys
+# Добавляю директорию mysite в системный путь Python для того чтобы ее можно было импортировать
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from mysite import settings_dev
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -71,7 +78,7 @@ class UpdateProfileForm(forms.ModelForm):
     # Переопределяем метод save чтобы изображение загруженное пользователем не теряло качество
     def save(self, commit=True):
         # Сохраняем экземпляр формы без сохранения в базе данных
-        instance = super().save(commit=False)
+        profile = super().save(commit=False)
 
         # Проверяем, есть ли изображение в форме
         if self.cleaned_data['avatar']:
@@ -80,18 +87,28 @@ class UpdateProfileForm(forms.ModelForm):
             if avatar.height > 300 or avatar.width > 300:
                 output_size = (300, 300)
                 avatar.thumbnail(output_size)
-
-                # Создание файла из изображения который можно сохранить в джанго
                 avatar_io = BytesIO()
-
-                # Сохраняем изображение в объект BytesIO
                 avatar.save(avatar_io, format='JPEG', quality=90)
 
-                # Сохраняем изображение в поле avatar экземпляра формы
-                instance.avatar.save(f'{instance.user.username}_avatar.jpg', File(avatar_io), save=False)
+                # Удаляем изображение, которое было загружено
+                try:
+                    profile.avatar.delete()
+                except BaseException as ex:
+                    print(ex)
+
+                # Удаляем предыдущее изображение профиля
+                # Получаем путь файла
+                prev_avatar_path = os.path.join(settings_dev.MEDIA_ROOT, 'profile_images', f'{self.instance.user.username}_avatar.jpg')
+
+                # Проверяем наличие файла
+                if default_storage.exists(prev_avatar_path):
+                    # Если файл существует, удаляем его
+                    default_storage.delete(prev_avatar_path)
+
+                profile.avatar.save(f'{profile.user.username}_avatar.jpg', File(avatar_io), save=False)
 
         if commit:
-            instance.save()
+            profile.save()
 
     class Meta:
         model = Profile

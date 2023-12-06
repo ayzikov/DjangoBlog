@@ -8,7 +8,12 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="text-center">
-                <img src="{{ user.profile.avatar.url }}" class="rounded-circle" style="cursor: pointer; width: 150px; height: 150px;"/>
+                <!-- Проверка наличия изображения в модели profile -->
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" class="rounded-circle" style="cursor: pointer; width: 150px; height: 150px;"/>
+                {% else %}
+                    <img src="/media/default.jpg" class="rounded-circle" style="cursor: pointer; width: 150px; height: 150px;"/>
+                {% endif %}
             </div>
 
             <!-- Вывод ошибок (если они есть) -->

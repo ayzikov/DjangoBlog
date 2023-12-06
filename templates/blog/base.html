@@ -41,7 +41,14 @@
                 {% if user.is_authenticated  %}
                     <li class="nav-item">
                         <a class="nav-link" href=" {% url 'accounts:profile' %}">
-                            <img src="{{ user.profile.avatar.url }}" alt="User Image" style="height: 25px; width: 25px; border-radius: 20px">
+
+                            <!-- Проверка наличия изображения в модели profile -->
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="User Image" style="height: 25px; width: 25px; border-radius: 20px">
+                            {% else %}
+                                <img src="/media/default.jpg" alt="User Image" style="height: 25px; width: 25px; border-radius: 20px">
+                            {% endif %}
+
                             {% if user.first_name %}
                                 {{ user.first_name }}
                             {% else %}
