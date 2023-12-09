@@ -17,7 +17,7 @@ import os
 import sys
 # Добавляю директорию mysite в системный путь Python для того чтобы ее можно было импортировать
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mysite import settings_dev
+from mysite import settings
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -98,7 +98,7 @@ class UpdateProfileForm(forms.ModelForm):
 
                 # Удаляем предыдущее изображение профиля
                 # Получаем путь файла
-                prev_avatar_path = os.path.join(settings_dev.MEDIA_ROOT, 'profile_images', f'{self.instance.user.username}_avatar.jpg')
+                prev_avatar_path = os.path.join(settings.MEDIA_ROOT, 'profile_images', f'{self.instance.user.username}_avatar.jpg')
 
                 # Проверяем наличие файла
                 if default_storage.exists(prev_avatar_path):

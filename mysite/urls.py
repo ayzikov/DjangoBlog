@@ -4,6 +4,7 @@ from django.contrib.sitemaps.views import sitemap
 from blog.sitemaps import PostSitemap
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.generic import RedirectView
 
 sitemaps = {
     'posts': PostSitemap,
@@ -19,6 +20,6 @@ urlpatterns = ([
     path('summernote/', include('django_summernote.urls')),
     path('api/', include('blog_api.urls', namespace='blog_api')),
     path("api-auth/", include("rest_framework.urls")),
-    re_path(r'^oauth/', include('social_django.urls', namespace='social'))
+    re_path(r'^oauth/', include('social_django.urls', namespace='social')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
                + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
