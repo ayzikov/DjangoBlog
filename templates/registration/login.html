@@ -7,6 +7,7 @@
         <a href="{% url 'accounts:signup'  %}" class="btn btn-link btn-lg active btn-block">Зарегистрироваться</a>
         <a href="{% url 'social:begin' 'vk-oauth2' %}" class="btn btn-link btn-lg active btn-block">Войти через ВК</a>
         <a href="{% url 'social:begin' 'github' %}" class="btn btn-link btn-lg active btn-block">Войти через GitHub</a>
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-link btn-lg active btn-block">Войти через Google</a>
 
         <!-- форма для входа -->
         <form method="post" class="form">
