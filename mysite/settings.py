@@ -171,6 +171,10 @@ SOCIAL_AUTH_VK_APP_USER_MODE = 2
 SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 
+# настройки для авторизации Google
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
 # При использовании PostgreSQL рекомендуется использовать встроенное поле JSONB для хранения извлеченных дополнительных_данных.
 # Эта настройка контролирует, как библиотека social-auth-app-django обрабатывает поля JSON в моделях.
 # Если эта настройка включена, библиотека будет использовать JSONField из Django для хранения данных в формате JSON.
